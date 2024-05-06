@@ -60,7 +60,7 @@ Clone the repository to your local machine and initialize it with a new dotnet a
 ```bash
 git clone <your-repo-url>
 cd echo-app
-````
+```
 
 Download the dotnet application template from [here](https://github.com/tasb/echo-app-demo/archive/refs/tags/v1.0.zip) and extract it to the root of the repository.
 
@@ -86,11 +86,9 @@ On main screen, check the `Issues` option to enable GitHub Issues on your repo.
 
 ![Enable Issues](images/lab-01/image02.png "Enable Issues")
 
-Next navigate to `Branches` option available on the left side option, under block `Code and Automation`. On that screen click on `Add rule` button as shown on next image.
+Next navigate to `Branches` option available on the left side option, under block `Code and Automation`. On that screen click on `Add branch protection rule` button.
 
-![Add rule](images/lab-01/image03.png "Add Rule")
-
-On new screen, add `main`on `Branch name pattern`. This option will enable this policy on `main` branch, meaning that all merges (updates) on that branch must came from a Pull Request.
+On new screen, add `main` on `Branch name pattern`. This option will enable this policy on `main` branch, meaning that all merges (updates) on that branch must came from a Pull Request.
 
 You need to enable the option `Require a pull request before merging` to enable the policy. You need to **disable** `Required approvals` option, since you're the only user on that repo and by default, GitHub don't allow that the creator of a pull request can approve his own changes.
 
@@ -158,9 +156,7 @@ On the file you should replace the following tokens:
 
 This file will be used to create a Federated Credential between your Azure AD (through your App Registration) and your GitHub repository and allow only the workflows on your repository to use the credentials created on this App Registration.
 
-Don't delete this file because you'll need to use it again on next lab.
-
-Now, execute the following command to create a credential on your App Registration (look at the diferences if you're using Powershell or bash/zsh).
+Now, execute the following command to create a credential on your App Registration (look at the differences if you're using Powershell or bash/zsh).
 
 Bash/Zsh version:
 
@@ -174,6 +170,45 @@ PowerShell version:
 az ad app federated-credential create --id <OBJECT_ID> --parameters "policy.json"
 ```
 
+Now update your `policy.json` file with the following content:
+
+```json
+{
+  "name": "gh-repo-env-uat",
+  "issuer": "https://token.actions.githubusercontent.com",
+  "subject": "repo:<GH-USERNAME>/<GH-REPO>:environment:uat",
+  "audiences": [
+    "api://AzureADTokenExchange"
+  ]
+}
+```
+
+And run the following command to update your App Registration, replacing the `<APP_ID>` with the value you get on previous command:
+
+```bash
+az ad app federated-credential create --id <APP_ID> --parameters @policy.json
+```
+
+Since you'll use two environments, let add the federated credential to `prod` environment too.
+
+Update your `policy.json` file with the following content:
+
+```json
+{
+  "name": "gh-repo-env-prod",
+  "issuer": "https://token.actions.githubusercontent.com",
+  "subject": "repo:<GH-USERNAME>/<GH-REPO>:environment:prod",
+  "audiences": [
+    "api://AzureADTokenExchange"
+  ]
+}
+```
+
+And run the following command to update your App Registration, replacing the `<APP_ID>` with the value you get on previous command:
+
+```bash
+az ad app federated-credential create --id <APP_ID> --parameters @policy.json
+```
 
 Finally, you need to create a Service Principal, the service account that will effectively do the login in Azure on behalf of your GitHub workflow.
 
@@ -190,7 +225,7 @@ On this lab, we'll use the `Contributor` role, that allows the Service Principal
 For that, run the following command:
 
 ```bash
-az role assignment create --assignee <APP_ID> --role Contributor --scope "/subscriptions/XXX"
+az role assignment create --assignee <APP_ID> --role Contributor --scope "/subscriptions/49175c01-02a7-44bb-b379-2c06f4aae5b4"
 ```
 
 Last step, is to make this details available on GitHub repository, so the workflows can use it.
@@ -204,10 +239,10 @@ Go to your repo and navigate to `Settings > Secrets and variables > Actions`, th
   - Secret: <APP_ID>
 - Secret #2
   - Name: AZURE_TENANT_ID
-  - Secret: XXX
+  - Secret: d5fe066f-22b6-4c2b-acc3-04f8b6dddf6c
 - Secret #3
   - Name: AZURE_SUBSCRIPTION_ID
-  - Secret: XXX
+  - Secret: 49175c01-02a7-44bb-b379-2c06f4aae5b4
 
 ### Step 05: Create GitHub Environments
 
@@ -217,14 +252,14 @@ Navigate to `Settings > Environments` and click on `New environment`.
 
 First, you may create Staging environment. On environment name add `uat` and click on `Configure environment`.
 
-On the new screen, click on the `Add Secret` link at the end the screen and fill the form with the following parameters:
+On the new screen, click on the `Add environment secret` link at the end the screen and fill the form with the following parameters:
 
 - Name: `DB_PASSWORD`
 - Value: `P@ssw0rd`
 
 Finally, let's create Production environment. Repeat the process clicking on `New environment` button and set environment name as `prod`.
 
-On the new screen, click on the `Add Secret` link at the end the screen and fill the form with the following parameters:
+On the new screen, click on the `Add environment secret` link at the end the screen and fill the form with the following parameters:
 
 - Name: `DB_PASSWORD`
 - Value: `P@ssw0rd`
@@ -237,15 +272,15 @@ You need to click on `Save protection rules` to save this setting. Any other set
 
 Doing this you are creating a pre-approval gate on your production environment, meaning someone (on this case, you) need to explicitly approve the deployment on the production environment.
 
-Then, on `Deployment branches` block, click on the dropdown and select `Selected branches` option. Now you need to define from which repo branch are you allowed to deploy to this environment.
+Then, on `Deployment branches and tags` block, click on the dropdown and select `Protected branches only` option. With this option you're setting only branches with protection rules to be able to deploy code in `prod` environment.
 
-Click on `Add deployment branch rule` and set `main` on `Branch name pattern:` input box.
+Since you created the protection rule on `main` branch, only code merged on `main` branch will be able to be deployed on `prod` environment.
 
 ### Step 06: Create Azure Storage
 
 You need an Azure Storage to keep your Terraform state to be used when you execute your pipeline and have access to last know state created by Terraform tool.
 
-Navigate to [Azure Portal](https://portal.azure.com/) and login with your  credentials.
+Navigate to [Azure Portal](https://portal.azure.com/) and login with your credentials.
 
 On top search box, search for `Storage Accounts` and click on the result with the same name as stated on following image.
 
@@ -311,6 +346,8 @@ On the `.github/workflows` folder, you have 4 files:
 Take same time to review the content of each file and understand what each one does. On workflows, check how the triggers are set up and how the jobs are defined.
 
 Review that there is some steps that will be executed based on conditions, life if the trigger is a pull request or a push on a specific branch.
+
+Since this repo is a public repo, GitHub will run automatically DependaBot to check for new versions of your dependencies and create pull requests to update them. This is a good practice to keep your code updated and secure.
 
 ### Step 08: Create a new issue
 
@@ -444,9 +481,11 @@ These workflows will build your applications and deploy them to Azure.
 
 You may check the progress of the workflows on the `Actions` tab on your repository.
 
-The worklows will create automatically the UAT environment and deploy the applications to it.
+The workflows will create automatically the UAT environment and deploy the applications to it.
 
-When the workflows are doe with UAT environment, you may check if the applications are working as expected.
+When the workflows are done with UAT environment, you may check if the applications are working as expected.
+
+On the Workflow you get a direct link to the UAT environment, so you may click on it and check if the applications are working as expected.
 
 If you check everything is ok, you may go to the `Environments` tab on your repository and promote the UAT environment to the Production environment, approving the deployment.
 
