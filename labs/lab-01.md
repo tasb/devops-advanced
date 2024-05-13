@@ -309,19 +309,13 @@ After that validation finished successfully, `Create` button will turn blue and 
 
 The process to create your storage account just started and you need to wait a couple of minutes until have access to your resource.
 
-When the creation finished with success you get a screen like this.
-
-![Storage Account created](./images/lab05/image03.png "Storage Account created")
-
 To finalize this configuration, you need to create a container inside your Azure Storage Account.
 
 A container can be seen as a folder and is where Terraform state files will be stored.
 
 Click on `Go to resource` blue button and you get access to all details and configurations of your Azure Storage.
 
-Click on `Containers` option on left side bar, then on `+ Container` and finally add `tfstate` as container name and select `Blob (anonymous read access for blobs only)` as `Public access level` and to finalize click on `Create` button.
-
-![Storage Account container](./images/lab05/image04.png "Storage Account container")
+Click on `Containers` option on left side bar, then on `+ Container` and finally add `tfstate` as container name and click on `Create` button.
 
 Now you have everything ready to start to implement your Infra as Code scripts and update (or create) your workflows.
 
