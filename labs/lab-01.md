@@ -407,6 +407,27 @@ terraform {
 
 You need to do the same on file `deploy/terraform/echo-webapp/main.tf`.
 
+Then you need to change some variables before you can run your Terraform scripts.
+
+Edit file `deploy/terraform/echo-api/terraform.tfvars` and update the following variables:
+
+```hcl
+appName = "tbernardo-echo-app"
+dbName = "my-echodb"
+```
+
+Replace `tbernardo` and `my` with your prefix.
+
+Then, edit file `deploy/terraform/echo-webapp/terraform.tfvars` and update the following variables:
+
+```hcl
+appName = "tbernardo-echo-app"
+```
+
+Replace `tbernardo` with your prefix.
+
+Now, you're ready to run your Terraform scripts.
+
 ### Step 11: Change your app code
 
 Edit file `echo-webapp/Pages/Shared/_Layout.cshtml` and find line 27.
