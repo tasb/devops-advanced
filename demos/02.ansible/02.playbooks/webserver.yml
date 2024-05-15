@@ -1,0 +1,64 @@
+---
+- name: Install and configure Nginx
+  hosts: webserver
+  become: yes  # Use privilege escalation to run tasks as root
+  gather_facts: false  # Disable facts gathering to speed up execution
+  vars:
+    static_files_path: "/opt/nginx/static"
+    nginx_version: 1.18.*
+  tasks:
+    - name: Update and upgrade apt packages
+      ansible.builtin.apt:
+        update_cache: yes
+        cache_valid_time: 86400 #One day
+    
+    - name: Install Nginx
+      ansible.builtin.apt:
+        name: "nginx={{ nginx_version }}"
+        state: present
+
+    - name: Start Nginx service
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: yes
+
+    - name: Ensure the static files directory exists
+      ansible.builtin.file:
+        path: "{{ static_files_path }}"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Copy static files from control node to target
+      ansible.builtin.copy:
+        src: "./static/"
+        dest: "{{ static_files_path }}"
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Replace "/var/www/html;" with "/opt/nginx/static;"
+      ansible.builtin.replace:
+        path: /etc/nginx/sites-available/default
+        regexp: "^\\s*root\\s+/var/www/html;"
+        replace: "        root {{ static_files_path }};"
+
+    - name: Reload Nginx to apply changes
+      ansible.builtin.service:
+        name: nginx
+        state: reloaded
+
+    - name: Check if nginx is delivering the default page
+      ansible.builtin.uri:
+        url: "http://{{ inventory_hostname }}:80"
+        status_code: 200
+        timeout: 10
+        return_content: true
+      register: web_page_content
+
+    - name: Print web page content
+      ansible.builtin.debug:
+        var: web_page_content.content
+      

@@ -1,0 +1,10 @@
+---
+- name: Install and Test Nginx
+  hosts: webserver
+  become: true
+
+  tasks:
+    - name: Install Nginx
+      ansible.builtin.apt:
+        name: "nginx={{ nginx_version }}"
+        state: absent

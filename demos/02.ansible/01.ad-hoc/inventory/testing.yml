@@ -1,0 +1,9 @@
+ungrouped:
+webserver:
+  hosts:
+    tiberna-rasp-002:
+nodes:
+  hosts:
+    tiberna-rasp-001:
+    tiberna-rasp-002:
+    tiberna-rasp-003:
