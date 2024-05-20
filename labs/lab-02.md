@@ -457,7 +457,7 @@ Create a new file named `playbook.yml` inside the `github-runner` folder.
 
     - name: Configure GitHub Runner
       ansible.builtin.command: |
-        /home/github-runner/config.sh --url https://github.com/theonorg/echo-app --token ${{ GITHUB_TOKEN }}
+        /home/github-runner/config.sh --url <your-repo-url> --token ${{ GITHUB_TOKEN }}
       become: true
 
     - name: Install GitHub Runner as a service
@@ -470,6 +470,8 @@ Create a new file named `playbook.yml` inside the `github-runner` folder.
         exec_start: /home/github-runner/run.sh
       become: true
 ```
+
+Replace `<your-repo-url>` with the URL of your repository.
 
 Take a deep look into your playbook and check all tasks that will be performed on your newly created VM.
 
