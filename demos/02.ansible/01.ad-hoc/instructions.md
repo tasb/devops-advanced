@@ -16,6 +16,12 @@ ansible all -m ansible.builtin.ping
 ansible nodes -m ansible.builtin.copy -a "src=/etc/hosts dest=/tmp/hosts"
 ```
 
+## Check if file was copied
+
+```bash
+ansible nodes -m ansible.builtin.command -a "cat /tmp/hosts"
+```
+
 ## Install nginx-light
 
 ```bash
