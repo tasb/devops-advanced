@@ -523,7 +523,7 @@ jobs:
     needs: pack
 
     env:
-      PVT_KEY: ${{ secrets.VM_PVT_KEY }}
+      PVT_KEY: ${{ secrets.GH_RUNNER_PRIVATE_KEY }}
 
     steps:
     - uses: actions/download-artifact@v3
