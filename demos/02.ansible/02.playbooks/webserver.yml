@@ -2,7 +2,7 @@
 - name: Install and configure Nginx
   hosts: webserver
   become: yes  # Use privilege escalation to run tasks as root
-  gather_facts: false  # Disable facts gathering to speed up execution
+  #gather_facts: false  # Disable facts gathering to speed up execution
   vars:
     static_files_path: "/opt/nginx/static"
     nginx_version: 1.18.*
@@ -60,5 +60,5 @@
 
     - name: Print web page content
       ansible.builtin.debug:
-        var: web_page_content.content
+        var: web_page_content
       

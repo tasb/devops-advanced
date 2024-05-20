@@ -336,7 +336,7 @@ Now you can commit and push the changes to your repository.
 ```bash
 git add -A
 git commit -m "add GitHub Runner deployment"
-git push origin topic/lab-02
+git push origin topic/lab-02-tf
 ```
 
 Create a pull request to merge the changes to the `main` branch.
@@ -549,7 +549,7 @@ Now you can commit and push the changes to your repository.
 ```bash
 git add -A
 git commit -m "add GitHub Runner deployment"
-git push origin topic/lab-02
+git push origin topic/lab-02-ansible
 ```
 
 Create a pull request to merge the changes to the `main` branch.
