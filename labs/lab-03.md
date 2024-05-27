@@ -48,7 +48,7 @@ resource "azurerm_app_configuration_feature" "getlogsff" {
 
 Now let's edit the App Service code to automatically include the connection string to the App Configuration.
 
-Find the resource `azurerm_app_service` and add update to have this final code:
+Find the resource `azurerm_linux_web_app` and add update to have this final code:
 
 ```hcl
 resource "azurerm_linux_web_app" "webapp" {
