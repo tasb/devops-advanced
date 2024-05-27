@@ -485,7 +485,7 @@ Create a new file named `playbook.yml` inside the `github-runner` folder.
     - name: Configure GitHub Runner
       ansible.builtin.command: |
         ./config.sh \
-        --url https://github.com/theonorg/echo-app \
+        --url <your-repo-url> \
         --token {{ github_token }} \
         --name "myRunner" \
         --labels "myRunner" \
