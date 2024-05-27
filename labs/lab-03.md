@@ -94,6 +94,8 @@ The SP name has the format `<PREFIX>-github-workflow`.
 
 Now, click on `Review + assign` and then click on `Assign`.
 
+Do the same process for the resource group `<your-prefix>-echo-app-webapp-prod-rg`.
+
 ## Step 03 - Use the Feature Flag
 
 Now let's use the feature flag in the code.
