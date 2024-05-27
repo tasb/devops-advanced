@@ -1,17 +1,17 @@
 ---
 - name: Install and configure Nginx
   hosts: webserver
-  become: yes  # Use privilege escalation to run tasks as root
-  #gather_facts: false  # Disable facts gathering to speed up execution
+  become: true  # Use privilege escalation to run tasks as root
+  # gather_facts: false  # Disable facts gathering to speed up execution
   vars:
     static_files_path: "/opt/nginx/static"
     nginx_version: 1.18.*
   tasks:
     - name: Update and upgrade apt packages
       ansible.builtin.apt:
-        update_cache: yes
-        cache_valid_time: 86400 #One day
-    
+        update_cache: true
+        cache_valid_time: 86400 # One day
+
     - name: Install Nginx
       ansible.builtin.apt:
         name: "nginx={{ nginx_version }}"
@@ -21,7 +21,7 @@
       ansible.builtin.service:
         name: nginx
         state: started
-        enabled: yes
+        enabled: true
 
     - name: Ensure the static files directory exists
       ansible.builtin.file:

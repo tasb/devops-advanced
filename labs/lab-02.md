@@ -358,7 +358,11 @@ You should get two important outputs:
 - The public IP address of the GitHub Runner VM
 - The private key of the SSH key pair
 
-For the private key, let's create a new repository secret named `GH_RUNNER_PRIVATE_KEY` and paste the private key value.
+To store the private key in GitHub Secrets, you need to encode the private key in base64.
+
+You can use an online tool to encode the private key in base64 like [base64encode.org](https://www.base64encode.org/).
+
+Let's create a new repository secret named `GH_RUNNER_PRIVATE_KEY` and paste the private key value encoded in base64.
 
 To create a secret, go to your repo and navigate to `Settings > Secrets and variables > Actions`, then click on `New repository secret`.
 
@@ -422,53 +426,89 @@ Create a new file named `playbook.yml` inside the `github-runner` folder.
 
 ```yaml
 ---
+---
 - name: Prepare VM for GitHub Runner
   hosts: runner
-  become: true
-
+  gather_facts: true
+  vars:
+    github_token: ""
+    username: "azureadmin"
+  
   tasks:
+
+    - name: Ping
+      ping:
+
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: yes
+      become: true
+
     - name: Install required packages
       ansible.builtin.apt:
         name: ['git', 'curl', 'jq', 'dotnet-sdk-8.0']
         state: present
       become: true
 
-    - name: Create GitHub Runner user
-      ansible.builtin.user:
-        name: github-runner
-        state: present
-        shell: /bin/bash
-        createhome: yes
-      become: true
+    - name: Create runner directory
+      ansible.builtin.file:
+        path: /home/{{ username }}/runner
+        state: directory
+        mode: 0755
+        owner: "{{ username }}"
+        group: "{{ username }}"
 
     - name: Download GitHub Runner
       ansible.builtin.get_url:
-        url: https://github.com/actions/runner/releases/latest/download/actions-runner-linux-x64-2.283.2.tar.gz
-        dest: /home/github-runner/actions-runner-linux-x64.tar.gz
+        url: "https://github.com/actions/runner/releases/download/v2.316.1/actions-runner-linux-x64-2.316.1.tar.gz"
+        dest: /home/{{ username }}/runner/actions-runner-linux-x64.tar.gz
         mode: 0644
-      become: true
+      register: download_runner
 
     - name: Extract GitHub Runner
       ansible.builtin.unarchive:
-        src: /home/github-runner/actions-runner-linux-x64.tar.gz
-        dest: /home/github-runner
-        remote_src: yes
-      become: true
+        src: /home/{{ username }}/runner/actions-runner-linux-x64.tar.gz
+        dest: /home/{{ username }}/runner
+        remote_src: true
+      when: download_runner.changed
+
+    - name: Check if runner service name file exist
+      ansible.builtin.stat:
+        path: "/home/{{ username }}/runner/.runner"
+      register: runner_reg_file_path
+
+    - name: Check if runner service name file exist
+      ansible.builtin.stat:
+        path: "/home/{{ username }}/runner/.service"
+      register: runner_service_file_path
 
     - name: Configure GitHub Runner
       ansible.builtin.command: |
-        /home/github-runner/config.sh --url <your-repo-url> --token ${{ GITHUB_TOKEN }}
-      become: true
+        ./config.sh \
+        --url https://github.com/theonorg/echo-app \
+        --token {{ github_token }} \
+        --name "myRunner" \
+        --labels "myRunner" \
+        --runnergroup "Default" \
+        --unattended
+      args:
+        chdir: "/home/{{ username }}/runner"
+      when: not runner_reg_file_path.stat.exists
 
-    - name: Install GitHub Runner as a service
-      ansible.builtin.systemd:
-        name: actions.runner.your_vm_host
-        state: started
-        enabled: yes
-        daemon_reload: yes
-        user: github-runner
-        exec_start: /home/github-runner/run.sh
+    - name: Install GitHub Runner Service
+      ansible.builtin.command: "./svc.sh install"
+      args:
+        chdir: "/home/{{ username }}/runner"
       become: true
+      when: not runner_service_file_path.stat.exists
+
+    - name: Start GitHub Runner Service
+      ansible.builtin.command: "./svc.sh start"
+      args:
+        chdir: "/home/{{ username }}/runner"
+      become: true
+      when: not runner_service_file_path.stat.exists
+
 ```
 
 Replace `<your-repo-url>` with the URL of your repository.
@@ -525,7 +565,7 @@ jobs:
     needs: pack
 
     env:
-      PVT_KEY: ${{ secrets.GH_RUNNER_PRIVATE_KEY }}
+      PVT_KEY: ${{ secrets.VM_PVT_KEY }}
 
     steps:
     - uses: actions/download-artifact@v3
@@ -536,14 +576,15 @@ jobs:
     - name: create key file
       run: |
         cd ./ansible
-        echo $PVT_KEY > inventory/vm_key.pem
+        echo $PVT_KEY | base64 -d > inventory/vm_key.pem
         chmod 400 ./inventory/vm_key.pem
-        cat ./inventory/vm_key.pem
+       # cat ./inventory/vm_key.pem
 
     - name: run ansible playbook
       run: |
         cd ./ansible
-        ansible-playbook -i inventory/hosts.yml playbook.yml
+        ansible-playbook -i inventory/hosts.yml playbook.yml --extra-vars "github_token=${{ secrets.MY_PAT }}"
+
 ```
 
 Now you can commit and push the changes to your repository.
