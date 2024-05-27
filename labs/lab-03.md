@@ -70,12 +70,6 @@ resource "azurerm_linux_web_app" "webapp" {
 }
 ```
 
-To validate, navigate to Azure Portal and verify:
-
-- The App Configuration service was created
-- The feature flag was created
-- The App Service has the connection string to the App Configuration
-
 ## Step 02 - Configure Azure Permissions
 
 To allow the Terraform to create the feature flag, we need to give permissions to the App Configuration service.
@@ -194,6 +188,12 @@ To do that proceed to implement a full pull request cycle as you've done on prev
 After the pull request is merged, the GitHub Actions will deploy the changes to Azure.
 
 Navigate to the App Service URL and verify that the feature flag is working, you should see a button `Get Logs` on the page.
+
+To validate, navigate to Azure Portal and verify:
+
+- The App Configuration service was created
+- The feature flag was created
+- The App Service has the connection string to the App Configuration
 
 ### Step 05 - Disable the Feature Flag
 
