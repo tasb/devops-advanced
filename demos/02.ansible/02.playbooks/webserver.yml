@@ -61,4 +61,3 @@
     - name: Print web page content
       ansible.builtin.debug:
         var: web_page_content
-      
