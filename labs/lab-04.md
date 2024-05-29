@@ -44,7 +44,11 @@ The property should look like this:
 baseURL: process.env.BASE_URL || '<URL_for_UAT_AppService>',
 ```
 
-Then remove all files  on the `tests` folder besides `echo.spec.ts`.
+Then remove all files on the `tests` folder besides `echo.spec.ts`.
+
+On folder `tests-examples` you can find a great example of Playwright usage for website <https://demo.playwright.dev/todomvc>. You can use as a good reference.
+
+For this lab, you should delete that folder before proceed.
 
 ### Step 03 - Run Playwright Tests locally
 
