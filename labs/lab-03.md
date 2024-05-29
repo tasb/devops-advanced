@@ -124,6 +124,14 @@ builder.Configuration.AddAzureAppConfiguration(options =>
 });
 ```
 
+At the beginning of the file, you should add the following using statement:
+
+```csharp
+using Microsoft.FeatureManagement;
+```
+
+You can place it right after the other using statements already there.
+
 Now let's use the feature flag on the web application.
 
 Edit the file `echo-webapp/Pages/_ViewImports.cshtml` and add the following code:
