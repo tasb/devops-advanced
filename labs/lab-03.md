@@ -107,7 +107,15 @@ Paste the code before the `</Project>` tag.
 
 Now let's add the feature flag in the `echo-webapp/Program.cs` file.
 
-Find the line with this content `var app = builder.Build();` and add the following code before that line:
+At the beginning of the file, you should add the following using statement:
+
+```csharp
+using Microsoft.FeatureManagement;
+```
+
+You can place it right after the other using statements already there.
+
+Then, find the line with this content `var app = builder.Build();` and add the following code before that line:
 
 ```csharp
 // Add Azure App Configuration middleware to the container of services.
@@ -124,13 +132,11 @@ builder.Configuration.AddAzureAppConfiguration(options =>
 });
 ```
 
-At the beginning of the file, you should add the following using statement:
+Finally, right after the line with this content `var app = builder.Build();` and add the following code:
 
 ```csharp
-using Microsoft.FeatureManagement;
+app.UseAzureAppConfiguration();
 ```
-
-You can place it right after the other using statements already there.
 
 Now let's use the feature flag on the web application.
 
