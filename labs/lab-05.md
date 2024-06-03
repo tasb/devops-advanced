@@ -44,20 +44,20 @@ Edit the file `.github/workflows/echo-webapp.yml` and add the following content 
 ```yaml
 - uses: actions/checkout@v4
 - uses: actions/setup-node@v4
-    with:
+  with:
     node-version: 18
 - name: Install dependencies
-    run: npm ci
-    working-directory: echo-webapp
+  run: npm ci
+  working-directory: echo-webapp
 - name: Install Playwright Browsers
-    run: npx playwright install --with-deps
-    working-directory: echo-webapp
+  run: npx playwright install --with-deps
+  working-directory: echo-webapp
 - name: Run Playwright tests
-    run: npx playwright test
-    working-directory: echo-webapp
+  run: npx playwright test
+  working-directory: echo-webapp
 - uses: actions/upload-artifact@v4
-    if: ${{ !cancelled() }}
-    with:
+  if: ${{ !cancelled() }}
+  with:
     name: playwright-report
     path: echo-webapp/playwright-report/
     retention-days: 30

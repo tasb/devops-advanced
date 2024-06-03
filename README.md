@@ -24,8 +24,6 @@ This course is designed to provide the student with the necessary knowledge to i
 - Integration Testing: Playwright
 - Feature Flags: App Configuration
 - Load Testing: JMeter, Azure Load Testing, K6
-- DAST: OWASP ZAP
-- Monitoring and APM: Azure Monitor, Application Insights
 
 ## Slides
 
