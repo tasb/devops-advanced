@@ -33,6 +33,7 @@ This course is designed to provide the student with the necessary knowledge to i
 - [02 - Configuration Management](slides/02.Ansible.pdf)
 - [03 - Feature Flags](slides/03.FeatureFlags.pdf)
 - [04 - Playwright](slides/04.Playwright.pdf)
+- [05 - Load Testing](slides/05.LoadTesting.pdf)
 
 ## Labs
 
@@ -40,3 +41,4 @@ This course is designed to provide the student with the necessary knowledge to i
 - [Lab 02 - Using Ansible to Create a GitHub Runner](labs/lab-02.md)
 - [Lab 03 - Using Feature Flags](labs/lab-03.md)
 - [Lab 04 - Run Playwright Tests](labs/lab-04.md)
+- [Lab 05 - Load testing and testing automation](labs/lab-05.md)
